@@ -44,14 +44,14 @@ func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)
 	msg := p.logic.DeleteID(id)
-	fmt.Fprintf(res, "%s\n", msg)
+	fmt.Fprintf(res, "%s/n", msg)
 }
 
 func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)
 	output := p.logic.PrintAllProductInfo()
-	fmt.Fprintf(res, "%s\n", output)
+	fmt.Fprintf(res, "%s", output)
 }
 
 func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
@@ -60,5 +60,5 @@ func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)
 	output := p.logic.GetProductInfo(id)
-	fmt.Fprintf(res, "%s\n", output)
+	fmt.Fprintf(res, "%s", output)
 }
