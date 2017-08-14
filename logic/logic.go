@@ -68,5 +68,8 @@ func (l *Logic) PrintAllProductInfo() string {
 
 //GetProductInfo returns product details for given id
 func (l *Logic) GetProductInfo(id int) string {
+	if l.mydb.Get(id) == "" {
+		return "Product id doesn't exist"
+	}
 	return l.mydb.Get(id)
 }
