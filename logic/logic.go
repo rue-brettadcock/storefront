@@ -62,7 +62,7 @@ func (l *Logic) DeleteID(id int) string {
 }
 
 //PrintAllProductInfo returns all product SKUs
-func (l *Logic) PrintAllProductInfo(id int) string {
+func (l *Logic) PrintAllProductInfo() string {
 	return l.mydb.Print()
 }
 
