@@ -4,6 +4,8 @@ import (
 	"flag"
 	"net/http"
 
+	"goji.io/pat"
+
 	"github.com/rue-brettadcock/storefront/logic"
 	"goji.io"
 )
@@ -20,6 +22,10 @@ func init() {
 func ListenAndServe() {
 	handler := Presentation{logic: logic.New()}
 	mux := goji.NewMux()
+
+	mux.HandleFunc(pat.Get("/addSKU/:id/:name/:vendor/:quantity"), handler.addSKU)
+	mux.HandleFunc(pat.Get("/updateSKU/:id/:quantity"), handler.updateSKU)
+	mux.HandleFunc(pat.Get("/deleteSKU/:id"), handler.deleteSKU)
 
 	http.ListenAndServe(bindTo, mux)
 }

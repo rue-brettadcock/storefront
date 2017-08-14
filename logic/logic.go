@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"errors"
 	"log"
 
 	"github.com/rue-brettadcock/storefront/database"
@@ -19,44 +18,47 @@ func New() *Logic {
 }
 
 //AddProductSKU validates product info and Inserts into the db
-func (l *Logic) AddProductSKU(id int, name string, vendor string, quantity int) error {
+func (l *Logic) AddProductSKU(id int, name string, vendor string, quantity int) string {
 	if l.mydb.Get(id) != "" {
-		return errors.New("Product id already exists")
+		return "Product id already exists"
 	}
 	if quantity < 1 {
-		return errors.New("Quantity must be at least 1")
+		return "Quantity must be at least 1"
 	}
 	if id < 0 {
-		return errors.New("ID must be positive")
+		return "ID must be positive"
 	}
 
 	err := l.mydb.Insert(id, name, vendor, quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return nil
+	return "Product successfully added to database"
 }
 
 //UpdateProductQuantity updates quantity for a given id
-func (l *Logic) UpdateProductQuantity(id, quantity int) error {
+func (l *Logic) UpdateProductQuantity(id, quantity int) string {
 	if l.mydb.Get(id) == "" {
-		return errors.New("Product id doesn't exist")
+		return "Product id doesn't exist"
 	}
 
 	err := l.mydb.Update(id, quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return nil
+	return "SKU successfully updated"
 }
 
 //DeleteID removes all product information for a given id
-func (l *Logic) DeleteID(id int) error {
+func (l *Logic) DeleteID(id int) string {
+	if l.mydb.Get(id) == "" {
+		return "Product id doesn't exist"
+	}
 	err := l.mydb.Delete(id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return nil
+	return "Product successfully deleted"
 }
 
 //PrintAllProductInfo returns all product SKUs

@@ -20,6 +20,10 @@ func New() *MyDb {
 	return &m
 }
 
+func (s *MyDb) Close() {
+	s.db.Close()
+}
+
 func (s *MyDb) openDatabaseConnection() {
 	var err error
 	s.db, err = sql.Open("mysql", "root:root@tcp(localhost:3306)/productInfo")
