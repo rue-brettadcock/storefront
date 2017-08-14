@@ -25,6 +25,8 @@ func ListenAndServe() {
 
 	mux.HandleFunc(pat.Get("/addSKU/:id/:name/:vendor/:quantity"), handler.addSKU)
 	mux.HandleFunc(pat.Get("/updateSKU/:id/:quantity"), handler.updateSKU)
+	mux.HandleFunc(pat.Get("/printSKUs"), handler.printSKUs)
+	mux.HandleFunc(pat.Get("/getSKU/:id"), handler.getSKU)
 	mux.HandleFunc(pat.Get("/deleteSKU/:id"), handler.deleteSKU)
 
 	http.ListenAndServe(bindTo, mux)
