@@ -46,3 +46,19 @@ func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
 	msg := p.logic.DeleteID(id)
 	fmt.Fprintf(res, "%s\n", msg)
 }
+
+func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "text/plain")
+	res.WriteHeader(http.StatusOK)
+	output := p.logic.PrintAllProductInfo()
+	fmt.Fprintf(res, "%s\n", output)
+}
+
+func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
+	id, _ := strconv.Atoi(pat.Param(req, "id"))
+
+	res.Header().Set("Content-Type", "text/plain")
+	res.WriteHeader(http.StatusOK)
+	output := p.logic.GetProductInfo(id)
+	fmt.Fprintf(res, "%s\n", output)
+}
