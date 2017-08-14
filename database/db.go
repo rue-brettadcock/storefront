@@ -55,12 +55,12 @@ func (s *MyDb) Update(id, quantity int) error {
 func (s *MyDb) Get(id int) string {
 	res, err := s.db.Query("SELECT * FROM products WHERE id=?", id)
 	if err != nil {
-		log.Fatal(err)
+		return ""
 	}
 	return printRows(res)
 }
 
-//Print prints stuff from database
+//Print prints product information from database
 func (s *MyDb) Print() string {
 	rows, err := s.db.Query("SELECT * FROM products")
 	if err != nil {
