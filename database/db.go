@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -10,6 +11,7 @@ import (
 //MyDb is a struct to restrict access to the db
 type MyDb struct {
 	db *sql.DB
+	mu sync.Mutex
 }
 
 //New initializes a pointer to a sql database
@@ -20,8 +22,15 @@ func New() *MyDb {
 	return &m
 }
 
+//Close ends the connection to the database
+func (s *MyDb) Close() {
+	s.db.Close()
+}
+
 func (s *MyDb) openDatabaseConnection() {
 	var err error
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.db, err = sql.Open("mysql", "root:root@tcp(localhost:3306)/productInfo")
 	if err != nil {
 		log.Fatal(err)
@@ -30,16 +39,22 @@ func (s *MyDb) openDatabaseConnection() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 //Delete removes an entry based on id from the products table in productInfo db
 func (s *MyDb) Delete(id int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	_, err := s.db.Exec("DELETE FROM products WHERE id=?", id)
+
 	return err
 }
 
 //Insert puts given product information into the products table in the db
 func (s *MyDb) Insert(id int, name string, vendor string, quantity int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	_, err := s.db.Exec("INSERT INTO products(id, name, vendor, quantity) VALUES(?, ?, ?, ?)",
 		id, name, vendor, quantity)
 	return err
@@ -47,21 +62,27 @@ func (s *MyDb) Insert(id int, name string, vendor string, quantity int) error {
 
 //Update changes the products quantity
 func (s *MyDb) Update(id, quantity int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	_, err := s.db.Exec("UPDATE products SET quantity=? WHERE id=?", quantity, id)
 	return err
 }
 
 //Get returns the product info for a given id
 func (s *MyDb) Get(id int) string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	res, err := s.db.Query("SELECT * FROM products WHERE id=?", id)
 	if err != nil {
-		log.Fatal(err)
+		return ""
 	}
 	return printRows(res)
 }
 
-//Print prints stuff from database
+//Print prints product information from database
 func (s *MyDb) Print() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	rows, err := s.db.Query("SELECT * FROM products")
 	if err != nil {
 		log.Fatal(err)
