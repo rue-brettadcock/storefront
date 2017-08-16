@@ -12,7 +12,7 @@ import (
 
 //Presentation for isolating access to logic layer
 type Presentation struct {
-	logic *logic.Logic
+	logic logic.Logic
 }
 
 func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {

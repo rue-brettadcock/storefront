@@ -7,18 +7,26 @@ import (
 )
 
 //Logic contains a pointer to a database instance
-type Logic struct {
-	mydb *database.MyDb
+type logic struct {
+	mydb database.SKUDataAccess
+}
+
+type Logic interface {
+	AddProductSKU(int, string, string, int) string
+	UpdateProductQuantity(int, int) string
+	DeleteID(int) string
+	PrintAllProductInfo() string
+	GetProductInfo(int) string
 }
 
 //New creates a new logic pointer to the database layer
-func New() *Logic {
-	l := Logic{mydb: database.New()}
+func New() Logic {
+	l := logic{mydb: database.New()}
 	return &l
 }
 
 //AddProductSKU validates product info and Inserts into the db
-func (l *Logic) AddProductSKU(id int, name string, vendor string, quantity int) string {
+func (l *logic) AddProductSKU(id int, name string, vendor string, quantity int) string {
 	if l.mydb.Get(id) != "" {
 		return "Product id already exists"
 	}
@@ -37,7 +45,7 @@ func (l *Logic) AddProductSKU(id int, name string, vendor string, quantity int) 
 }
 
 //UpdateProductQuantity updates quantity for a given id
-func (l *Logic) UpdateProductQuantity(id, quantity int) string {
+func (l *logic) UpdateProductQuantity(id, quantity int) string {
 	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
@@ -50,7 +58,7 @@ func (l *Logic) UpdateProductQuantity(id, quantity int) string {
 }
 
 //DeleteID removes all product information for a given id
-func (l *Logic) DeleteID(id int) string {
+func (l *logic) DeleteID(id int) string {
 	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
@@ -62,12 +70,12 @@ func (l *Logic) DeleteID(id int) string {
 }
 
 //PrintAllProductInfo returns all product SKUs
-func (l *Logic) PrintAllProductInfo() string {
+func (l *logic) PrintAllProductInfo() string {
 	return l.mydb.Print()
 }
 
 //GetProductInfo returns product details for given id
-func (l *Logic) GetProductInfo(id int) string {
+func (l *logic) GetProductInfo(id int) string {
 	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
