@@ -21,7 +21,6 @@ func (p *Presentation) handleHTTP(res http.ResponseWriter, req *http.Request) {
 	sku := buildSKU(values)
 
 	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
 
 	var msg string
 
@@ -36,8 +35,10 @@ func (p *Presentation) handleHTTP(res http.ResponseWriter, req *http.Request) {
 		msg = p.logic.PrintAllProductInfo()
 	case "/getSKU":
 		msg = p.logic.GetProductInfo(sku)
-
+	default:
+		res.WriteHeader(http.StatusNotFound)
 	}
+
 	fmt.Fprintf(res, "%s\n", msg)
 }
 
