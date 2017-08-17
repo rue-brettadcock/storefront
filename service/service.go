@@ -24,12 +24,7 @@ func ListenAndServe() {
 	handler := Presentation{logic: logic.New()}
 	mux := goji.NewMux()
 
-	// mux.HandleFunc(pat.Get("/addSKU/:id/:name/:vendor/:quantity"), handler.addSKU)
-	mux.HandleFunc(pat.Get("/addSKU/:vals"), handler.addSKU)
-	mux.HandleFunc(pat.Get("/updateSKU/:id/:quantity"), handler.updateSKU)
-	mux.HandleFunc(pat.Get("/printSKUs"), handler.printSKUs)
-	mux.HandleFunc(pat.Get("/getSKU/:id"), handler.getSKU)
-	mux.HandleFunc(pat.Get("/deleteSKU/:id"), handler.deleteSKU)
+	mux.HandleFunc(pat.Get("/*"), handler.handleHTTP)
 
 	log.Println("Listening...")
 	http.ListenAndServe(bindTo, mux)

@@ -14,56 +14,31 @@ type Presentation struct {
 	logic logic.Logic
 }
 
-func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
+func (p *Presentation) handleHTTP(res http.ResponseWriter, req *http.Request) {
+	u, prefix := formatPath(req.RequestURI)
+	fmt.Printf("prefix: " + prefix + "\nURL: " + u)
 	values, _ := url.ParseQuery(u)
 	sku := buildSKU(values)
 
 	res.Header().Set("Content-Type", "text/plain")
 	res.WriteHeader(http.StatusOK)
 
-	msg := p.logic.AddProductSKU(sku)
+	var msg string
+
+	switch prefix {
+	case "/addSKU":
+		msg = p.logic.AddProductSKU(sku)
+	case "/updateSKU":
+		msg = p.logic.UpdateProductQuantity(sku)
+	case "/deleteSKU":
+		msg = p.logic.DeleteID(sku)
+	case "/printSKUs":
+		msg = p.logic.PrintAllProductInfo()
+	case "/getSKU":
+		msg = p.logic.GetProductInfo(sku)
+
+	}
 	fmt.Fprintf(res, "%s\n", msg)
-}
-
-func (p *Presentation) updateSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
-
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	msg := p.logic.UpdateProductQuantity(sku)
-	fmt.Fprintf(res, "%s\n", msg)
-}
-
-func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
-
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	msg := p.logic.DeleteID(sku)
-	fmt.Fprintf(res, "%s/n", msg)
-}
-
-func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	output := p.logic.PrintAllProductInfo()
-	fmt.Fprintf(res, "%s", output)
-}
-
-func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
-
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	output := p.logic.GetProductInfo(sku)
-	fmt.Fprintf(res, "%s", output)
 }
 
 func buildSKU(vals url.Values) logic.SKU {
@@ -76,8 +51,8 @@ func buildSKU(vals url.Values) logic.SKU {
 	return sku
 }
 
-func formatPath(uri string) string {
-	rmPrefix, result := "", ""
+func formatPath(uri string) (string, string) {
+	prefix, suffix, result := "", "", ""
 	numSlash := 0
 
 	for i, r := range uri {
@@ -86,11 +61,12 @@ func formatPath(uri string) string {
 			numSlash++
 		}
 		if numSlash == 2 {
-			rmPrefix = uri[i+1:]
+			prefix = uri[:i]
+			suffix = uri[i+1:]
 			break
 		}
 	}
-	for _, r := range rmPrefix {
+	for _, r := range suffix {
 		c := string(r)
 		if c == "?" {
 			result += ";"
@@ -98,5 +74,5 @@ func formatPath(uri string) string {
 			result += c
 		}
 	}
-	return result
+	return result, prefix
 }
