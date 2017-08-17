@@ -4,9 +4,8 @@
 package mocks
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockSKUDataAccess is a mock of SKUDataAccess interface
