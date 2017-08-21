@@ -2,6 +2,7 @@ package logic
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/rue-brettadcock/storefront/database"
 )
@@ -22,10 +23,10 @@ type Logic interface {
 
 //SKU for holding product information
 type SKU struct {
-	ID       int
-	Name     string
-	Vendor   string
-	Quantity int
+	ID       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Vendor   string `json:"vendor,omitempty"`
+	Quantity string `json:"quantity,omitempty"`
 }
 
 //New creates a new logic pointer to the database layer
@@ -36,17 +37,19 @@ func New() Logic {
 
 //AddProductSKU validates product info and Inserts into the db
 func (l *logic) AddProductSKU(sku SKU) string {
-	if l.mydb.Get(sku.ID) != "" {
+	id, _ := strconv.Atoi(sku.ID)
+	quant, _ := strconv.Atoi(sku.Quantity)
+	if l.mydb.Get(id) != "" {
 		return "Product id already exists"
 	}
-	if sku.Quantity < 1 {
+	if quant < 1 {
 		return "Quantity must be at least 1"
 	}
-	if sku.ID < 0 {
+	if id < 0 {
 		return "ID must be positive"
 	}
 
-	err := l.mydb.Insert(sku.ID, sku.Name, sku.Vendor, sku.Quantity)
+	err := l.mydb.Insert(id, sku.Name, sku.Vendor, quant)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,11 +58,13 @@ func (l *logic) AddProductSKU(sku SKU) string {
 
 //UpdateProductQuantity updates quantity for a given id
 func (l *logic) UpdateProductQuantity(sku SKU) string {
-	if l.mydb.Get(sku.ID) == "" {
+	id, _ := strconv.Atoi(sku.ID)
+	quant, _ := strconv.Atoi(sku.Quantity)
+	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
 
-	err := l.mydb.Update(sku.ID, sku.Quantity)
+	err := l.mydb.Update(id, quant)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,10 +73,11 @@ func (l *logic) UpdateProductQuantity(sku SKU) string {
 
 //DeleteID removes all product information for a given id
 func (l *logic) DeleteID(sku SKU) string {
-	if l.mydb.Get(sku.ID) == "" {
+	id, _ := strconv.Atoi(sku.ID)
+	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
-	err := l.mydb.Delete(sku.ID)
+	err := l.mydb.Delete(id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,8 +91,9 @@ func (l *logic) PrintAllProductInfo() string {
 
 //GetProductInfo returns product details for given id
 func (l *logic) GetProductInfo(sku SKU) string {
-	if l.mydb.Get(sku.ID) == "" {
+	id, _ := strconv.Atoi(sku.ID)
+	if l.mydb.Get(id) == "" {
 		return "Product id doesn't exist"
 	}
-	return l.mydb.Get(sku.ID)
+	return l.mydb.Get(id)
 }
