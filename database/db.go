@@ -8,8 +8,14 @@ type SKUDataAccess interface {
 	Delete(int) error
 }
 
-//New initializes a pointer to a sql database
-func New() SKUDataAccess {
-	m := MyDb{db: openDatabaseConnection()}
-	return &m
+//NewSQL initializes a pointer to a sql database
+func NewSQL() SKUDataAccess {
+	sql := SQLdb{db: openDatabaseConnection()}
+	return &sql
+}
+
+//NewInMemoryDB initializes a pointer to a local database
+func NewInMemoryDB() SKUDataAccess {
+	mem := MemDb{db: newConnection()}
+	return &mem
 }
