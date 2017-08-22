@@ -58,8 +58,7 @@ func (m *MemDb) Update(id, amt int) error {
 func (m *MemDb) Delete(id int) error {
 	for i, s := range m.db {
 		if s.id == id {
-			temp := MemDb{db: append(m.db[:i], m.db[i+1:]...)}
-			m = &temp
+			m.db = append(m.db[:i], m.db[i+1:]...)
 			break
 		}
 	}
