@@ -93,8 +93,9 @@ func (l *logic) PrintAllProductInfo() string {
 //GetProductInfo returns product details for given id
 func (l *logic) GetProductInfo(sku SKU) (string, error) {
 	id, _ := strconv.Atoi(sku.ID)
-	if l.mydb.Get(id) == "[]" {
-		return "[]", errors.New("Product id doesn't exist")
+	info := l.mydb.Get(id)
+	if info == "[]" {
+		return info, errors.New("Product id doesn't exist")
 	}
-	return l.mydb.Get(id), nil
+	return info, nil
 }
