@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 
+	//drivers for mysql connection
 	_ "github.com/go-sql-driver/mysql"
 )
 

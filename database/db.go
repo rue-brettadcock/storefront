@@ -1,5 +1,6 @@
 package database
 
+//SKUDataAccess is for defining different types of databases
 type SKUDataAccess interface {
 	Insert(int, string, string, int) error
 	Get(int) string
