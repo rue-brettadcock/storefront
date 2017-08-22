@@ -22,10 +22,10 @@ func ListenAndServe() {
 	handler := Presentation{logic: logic.New()}
 	router := mux.NewRouter()
 
-	router.HandleFunc("/products/{id}", handler.addSKU).Methods("POST")
+	router.HandleFunc("/products", handler.addSKU).Methods("POST")
 	router.HandleFunc("/products/{id}", handler.getSKU).Methods("GET")
 	router.HandleFunc("/products", handler.printSKUs).Methods("GET")
-	router.HandleFunc("/products/{id}", handler.updateSKU).Methods("PUT")
+	router.HandleFunc("/products", handler.updateSKU).Methods("PUT")
 	router.HandleFunc("/products/{id}", handler.deleteSKU).Methods("DELETE")
 
 	log.Println("Listening...")
