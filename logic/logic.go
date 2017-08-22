@@ -32,7 +32,7 @@ type SKU struct {
 
 //New creates a new logic pointer to the database layer
 func New() Logic {
-	l := logic{mydb: database.New()}
+	l := logic{mydb: database.NewInMemoryDB()}
 	return &l
 }
 
