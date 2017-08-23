@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/rue-brettadcock/storefront/logic"
@@ -27,7 +28,6 @@ func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
 }
 
 func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "application/json")
 
 	msg := p.logic.PrintAllProductInfo()
 	fmt.Fprintf(res, "%v\n", msg)
@@ -39,11 +39,10 @@ func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
 }
 
 func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "application/json")
 
 	var sku logic.SKU
 	params := mux.Vars(req)
-	sku.ID = params["id"]
+	sku.ID, _ = strconv.Atoi(params["id"])
 	msg, err := p.logic.GetProductInfo(sku)
 	fmt.Fprintf(res, "%v\n", msg)
 	if err != nil {
@@ -68,7 +67,7 @@ func (p *Presentation) updateSKU(res http.ResponseWriter, req *http.Request) {
 func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
 	var sku logic.SKU
 	params := mux.Vars(req)
-	sku.ID = params["id"]
+	sku.ID, _ = strconv.Atoi(params["id"])
 
 	err := p.logic.DeleteID(sku)
 	if err != nil {
