@@ -17,7 +17,7 @@ func TestAddProductSKU_IDalreadyExists(t *testing.T) {
 	l.mydb = mDB
 	mDB.EXPECT().Get(100).Return("ID EXISTS")
 
-	sku := SKU{"100", "polo", "ralph lauren", "10"}
+	sku := SKU{100, "polo", "ralph lauren", 10}
 	expected := errors.New("Product id already exists")
 	actual := l.AddProductSKU(sku)
 
@@ -33,7 +33,7 @@ func TestAddProductSKU_quantityLessThan1(t *testing.T) {
 	l.mydb = mDB
 	mDB.EXPECT().Get(25).Return("")
 
-	sku := SKU{"25", "longboard", "landyachtz", "0"}
+	sku := SKU{25, "longboard", "landyachtz", 0}
 	expected := errors.New("Quantity must be at least 1")
 	actual := l.AddProductSKU(sku)
 
@@ -49,7 +49,7 @@ func TestAddProductSKU_NegativeID(t *testing.T) {
 	l.mydb = mDB
 	mDB.EXPECT().Get(-1).Return("")
 
-	sku := SKU{"-1", "longboard", "landyachtz", "1"}
+	sku := SKU{-1, "longboard", "landyachtz", 1}
 	expected := errors.New("ID must be positive")
 	actual := l.AddProductSKU(sku)
 
@@ -64,9 +64,9 @@ func TestAddProductSKU_ValidInput(t *testing.T) {
 	mDB := mocks.NewMockSKUDataAccess(mockCtrl)
 	l.mydb = mDB
 	mDB.EXPECT().Get(25).Return("")
-	mDB.EXPECT().Insert("25", "longboard", "landyachtz", "1").Return(nil)
+	mDB.EXPECT().Insert(25, "longboard", "landyachtz", 1).Return(nil)
 
-	sku := SKU{"25", "longboard", "landyachtz", "1"}
+	sku := SKU{25, "longboard", "landyachtz", 1}
 	actual := l.AddProductSKU(sku)
 
 	if actual != nil {
@@ -81,7 +81,7 @@ func TestUpdateProductQuantity_IDdoesntExist(t *testing.T) {
 	l.mydb = mDB
 	mDB.EXPECT().Get(25).Return("")
 
-	sku := SKU{"25", "", "", "13"}
+	sku := SKU{25, "", "", 13}
 	expected := errors.New("Product id doesn't exist")
 	actual := l.UpdateProductQuantity(sku)
 
@@ -98,7 +98,7 @@ func TestUpdateProductQuantity_SuccessfulUpdate(t *testing.T) {
 	mDB.EXPECT().Get(25).Return("ID EXISTS")
 	mDB.EXPECT().Update(25, 13).Return(nil)
 
-	sku := SKU{"25", "", "", "13"}
+	sku := SKU{25, "", "", 13}
 	actual := l.UpdateProductQuantity(sku)
 
 	if actual != nil {
@@ -113,7 +113,7 @@ func TestDeleteID_IDdoesntExist(t *testing.T) {
 	l.mydb = mDB
 	mDB.EXPECT().Get(1000).Return("")
 
-	sku := SKU{"1000", "", "", "13"}
+	sku := SKU{1000, "", "", 13}
 	expected := errors.New("Product id doesn't exist")
 	actual := l.DeleteID(sku)
 
@@ -130,7 +130,7 @@ func TestDeleteID_SuccessfulDelete(t *testing.T) {
 	mDB.EXPECT().Get(1000).Return("ID EXISTS")
 	mDB.EXPECT().Delete(1000).Return(nil)
 
-	sku := SKU{"1000", "longboard", "boosted", "13"}
+	sku := SKU{1000, "longboard", "boosted", 13}
 	actual := l.DeleteID(sku)
 
 	if actual != nil {
