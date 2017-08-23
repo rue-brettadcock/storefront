@@ -1,12 +1,14 @@
 package database
 
-import "fmt"
+import (
+	"encoding/json"
+)
 
 type sku struct {
-	id     int
-	name   string
-	vendor string
-	amt    int
+	ID       int    `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Vendor   string `json:"vendor,omitempty"`
+	Quantity int    `json:"quantity,omitempty"`
 }
 
 //MemDb is a struct to restrict access to the db
@@ -29,10 +31,9 @@ func (m *MemDb) Insert(id int, name string, vendor string, amt int) error {
 //Get returns the product info for a given id
 func (m *MemDb) Get(id int) string {
 	for _, s := range m.db {
-		if s.id == id {
-			var toPrint []sku
-			toPrint = append(toPrint, s)
-			return buildJSON(toPrint)
+		if s.ID == id {
+			res, _ := json.Marshal(&s)
+			return string(res)
 		}
 	}
 	return "[]"
@@ -40,14 +41,15 @@ func (m *MemDb) Get(id int) string {
 
 //Print prints product information from database
 func (m *MemDb) Print() string {
-	return buildJSON(m.db)
+	res, _ := json.Marshal(m.db)
+	return string(res)
 }
 
 //Update changes the products quantity
 func (m *MemDb) Update(id, amt int) error {
 	for _, s := range m.db {
-		if s.id == id {
-			s.amt = amt
+		if s.ID == id {
+			s.Quantity = amt
 			break
 		}
 	}
@@ -57,24 +59,10 @@ func (m *MemDb) Update(id, amt int) error {
 //Delete removes the sku with the matching id
 func (m *MemDb) Delete(id int) error {
 	for i, s := range m.db {
-		if s.id == id {
+		if s.ID == id {
 			m.db = append(m.db[:i], m.db[i+1:]...)
 			break
 		}
 	}
 	return nil
-}
-
-func buildJSON(list []sku) string {
-	if len(list) == 0 {
-		return "[]"
-	}
-
-	res := ""
-	for _, s := range list {
-		res += fmt.Sprintf("{\"id\":\"%v\",\"name\":\"%v\",\"vendor\":\"%v\",\"quantity\":\"%v\"},", s.id, s.name, s.vendor, s.amt)
-	}
-	res = "[" + res[:len(res)-1] + "]"
-
-	return res
 }
