@@ -42,6 +42,9 @@ func (m *MemDb) Get(id int) string {
 //Print prints product information from database
 func (m *MemDb) Print() string {
 	res, _ := json.Marshal(m.db)
+	if string(res) == "null" {
+		return "[]"
+	}
 	return string(res)
 }
 
