@@ -3,6 +3,7 @@ package logic
 import (
 	"errors"
 	"log"
+	"strconv"
 
 	"github.com/rue-brettadcock/storefront/database"
 )
@@ -23,7 +24,7 @@ type Logic interface {
 
 //SKU for holding product information
 type SKU struct {
-	ID       int    `json:"id,omitempty"`
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Vendor   string `json:"vendor,omitempty"`
 	Quantity int    `json:"quantity,omitempty"`
@@ -37,17 +38,18 @@ func New() Logic {
 
 //AddProductSKU validates product info and Inserts into the db
 func (l *logic) AddProductSKU(sku SKU) error {
-	if l.mydb.Get(sku.ID) != "[]" {
+	id, _ := strconv.Atoi(sku.ID)
+	if l.mydb.Get(id) != "[]" {
 		return errors.New("Product id already exists")
 	}
 	if sku.Quantity < 1 {
 		return errors.New("Quantity must be at least 1")
 	}
-	if sku.ID < 0 {
+	if id < 0 {
 		return errors.New("ID must be positive")
 	}
 
-	err := l.mydb.Insert(sku.ID, sku.Name, sku.Vendor, sku.Quantity)
+	err := l.mydb.Insert(id, sku.Name, sku.Vendor, sku.Quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,11 +58,12 @@ func (l *logic) AddProductSKU(sku SKU) error {
 
 //UpdateProductQuantity updates quantity for a given id
 func (l *logic) UpdateProductQuantity(sku SKU) error {
-	if l.mydb.Get(sku.ID) == "[]" {
+	id, _ := strconv.Atoi(sku.ID)
+	if l.mydb.Get(id) == "[]" {
 		return errors.New("Product id doesn't exist")
 	}
 
-	err := l.mydb.Update(sku.ID, sku.Quantity)
+	err := l.mydb.Update(id, sku.Quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,10 +72,11 @@ func (l *logic) UpdateProductQuantity(sku SKU) error {
 
 //DeleteID removes all product information for a given id
 func (l *logic) DeleteID(sku SKU) error {
-	if l.mydb.Get(sku.ID) == "[]" {
+	id, _ := strconv.Atoi(sku.ID)
+	if l.mydb.Get(id) == "[]" {
 		return errors.New("Product id doesn't exist")
 	}
-	err := l.mydb.Delete(sku.ID)
+	err := l.mydb.Delete(id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,7 +90,8 @@ func (l *logic) PrintAllProductInfo() string {
 
 //GetProductInfo returns product details for given id
 func (l *logic) GetProductInfo(sku SKU) (string, error) {
-	info := l.mydb.Get(sku.ID)
+	id, _ := strconv.Atoi(sku.ID)
+	info := l.mydb.Get(id)
 	if info == "[]" {
 		return info, errors.New("Product id doesn't exist")
 	}
