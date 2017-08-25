@@ -1,11 +1,11 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/rue-brettadcock/storefront/logic"
 )
 
@@ -15,88 +15,63 @@ type Presentation struct {
 }
 
 func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
+	var sku logic.SKU
+	json.NewDecoder(req.Body).Decode(&sku)
 
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-
-	msg := p.logic.AddProductSKU(sku)
-	fmt.Fprintf(res, "%s\n", msg)
-}
-
-func (p *Presentation) updateSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
-
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	msg := p.logic.UpdateProductQuantity(sku)
-	fmt.Fprintf(res, "%s\n", msg)
-}
-
-func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
-
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	msg := p.logic.DeleteID(sku)
-	fmt.Fprintf(res, "%s/n", msg)
+	err := p.logic.AddProductSKU(sku)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	res.WriteHeader(http.StatusCreated)
 }
 
 func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set("Content-Type", "text/plain")
+
+	msg := p.logic.PrintAllProductInfo()
+	fmt.Fprintf(res, "%v\n", msg)
+	if msg == "[]" {
+		res.WriteHeader(http.StatusNoContent)
+		return
+	}
 	res.WriteHeader(http.StatusOK)
-	output := p.logic.PrintAllProductInfo()
-	fmt.Fprintf(res, "%s", output)
 }
 
 func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
-	u := formatPath(req.RequestURI)
-	values, _ := url.ParseQuery(u)
-	sku := buildSKU(values)
 
-	res.Header().Set("Content-Type", "text/plain")
-	res.WriteHeader(http.StatusOK)
-	output := p.logic.GetProductInfo(sku)
-	fmt.Fprintf(res, "%s", output)
-}
-
-func buildSKU(vals url.Values) logic.SKU {
 	var sku logic.SKU
-	sku.ID, _ = strconv.Atoi(vals.Get("id"))
-	sku.Name = vals.Get("name")
-	sku.Vendor = vals.Get("vend")
-	sku.Quantity, _ = strconv.Atoi(vals.Get("amt"))
-
-	return sku
+	params := mux.Vars(req)
+	sku.ID = params["id"]
+	msg, err := p.logic.GetProductInfo(sku)
+	fmt.Fprintf(res, "%v\n", msg)
+	if err != nil {
+		res.WriteHeader(http.StatusNoContent)
+		return
+	}
+	res.WriteHeader(http.StatusOK)
 }
 
-func formatPath(uri string) string {
-	rmPrefix, result := "", ""
-	numSlash := 0
+func (p *Presentation) updateSKU(res http.ResponseWriter, req *http.Request) {
+	var sku logic.SKU
+	json.NewDecoder(req.Body).Decode(&sku)
 
-	for i, r := range uri {
-		c := string(r)
-		if c == "/" {
-			numSlash++
-		}
-		if numSlash == 2 {
-			rmPrefix = uri[i+1:]
-			break
-		}
+	err := p.logic.UpdateProductQuantity(sku)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		return
 	}
-	for _, r := range rmPrefix {
-		c := string(r)
-		if c == "?" {
-			result += ";"
-		} else {
-			result += c
-		}
+	res.WriteHeader(http.StatusOK)
+}
+
+func (p *Presentation) deleteSKU(res http.ResponseWriter, req *http.Request) {
+	var sku logic.SKU
+	params := mux.Vars(req)
+	sku.ID = params["id"]
+
+	err := p.logic.DeleteID(sku)
+	if err != nil {
+		res.WriteHeader(http.StatusNoContent)
+		return
 	}
-	return result
+	res.WriteHeader(http.StatusOK)
 }

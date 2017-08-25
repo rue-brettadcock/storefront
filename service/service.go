@@ -5,10 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"goji.io/pat"
-
+	"github.com/gorilla/mux"
 	"github.com/rue-brettadcock/storefront/logic"
-	"goji.io"
 )
 
 var (
@@ -22,15 +20,14 @@ func init() {
 // ListenAndServe initializes and starts the service
 func ListenAndServe() {
 	handler := Presentation{logic: logic.New()}
-	mux := goji.NewMux()
+	router := mux.NewRouter()
 
-	// mux.HandleFunc(pat.Get("/addSKU/:id/:name/:vendor/:quantity"), handler.addSKU)
-	mux.HandleFunc(pat.Get("/addSKU/:vals"), handler.addSKU)
-	mux.HandleFunc(pat.Get("/updateSKU/:id/:quantity"), handler.updateSKU)
-	mux.HandleFunc(pat.Get("/printSKUs"), handler.printSKUs)
-	mux.HandleFunc(pat.Get("/getSKU/:id"), handler.getSKU)
-	mux.HandleFunc(pat.Get("/deleteSKU/:id"), handler.deleteSKU)
+	router.HandleFunc("/products", handler.addSKU).Methods("POST")
+	router.HandleFunc("/products/{id}", handler.getSKU).Methods("GET")
+	router.HandleFunc("/products", handler.printSKUs).Methods("GET")
+	router.HandleFunc("/products", handler.updateSKU).Methods("PUT")
+	router.HandleFunc("/products/{id}", handler.deleteSKU).Methods("DELETE")
 
 	log.Println("Listening...")
-	http.ListenAndServe(bindTo, mux)
+	http.ListenAndServe(bindTo, router)
 }
