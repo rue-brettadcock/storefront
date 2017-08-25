@@ -5,7 +5,7 @@ import (
 )
 
 type sku struct {
-	ID       int    `json:"id,omitempty"`
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Vendor   string `json:"vendor,omitempty"`
 	Quantity int    `json:"quantity,omitempty"`
@@ -23,13 +23,13 @@ func newConnection() []sku {
 }
 
 //Insert puts given product information into a sku in the slice
-func (m *MemDb) Insert(id int, name string, vendor string, amt int) error {
+func (m *MemDb) Insert(id string, name string, vendor string, amt int) error {
 	m.db = append(m.db, sku{id, name, vendor, amt})
 	return nil
 }
 
 //Get returns the product info for a given id
-func (m *MemDb) Get(id int) string {
+func (m *MemDb) Get(id string) string {
 	for _, s := range m.db {
 		if s.ID == id {
 			res, _ := json.Marshal(&s)
@@ -49,7 +49,7 @@ func (m *MemDb) Print() string {
 }
 
 //Update changes the products quantity
-func (m *MemDb) Update(id, amt int) error {
+func (m *MemDb) Update(id string, amt int) error {
 	for _, s := range m.db {
 		if s.ID == id {
 			s.Quantity = amt
@@ -60,7 +60,7 @@ func (m *MemDb) Update(id, amt int) error {
 }
 
 //Delete removes the sku with the matching id
-func (m *MemDb) Delete(id int) error {
+func (m *MemDb) Delete(id string) error {
 	for i, s := range m.db {
 		if s.ID == id {
 			m.db = append(m.db[:i], m.db[i+1:]...)
