@@ -32,7 +32,7 @@ func (_m *MockSKUDataAccess) EXPECT() *MockSKUDataAccessMockRecorder {
 }
 
 // Insert mocks base method
-func (_m *MockSKUDataAccess) Insert(_param0 int, _param1 string, _param2 string, _param3 int) error {
+func (_m *MockSKUDataAccess) Insert(_param0 string, _param1 string, _param2 string, _param3 int) error {
 	ret := _m.ctrl.Call(_m, "Insert", _param0, _param1, _param2, _param3)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -44,7 +44,7 @@ func (_mr *MockSKUDataAccessMockRecorder) Insert(arg0, arg1, arg2, arg3 interfac
 }
 
 // Get mocks base method
-func (_m *MockSKUDataAccess) Get(_param0 int) string {
+func (_m *MockSKUDataAccess) Get(_param0 string) string {
 	ret := _m.ctrl.Call(_m, "Get", _param0)
 	ret0, _ := ret[0].(string)
 	return ret0
@@ -68,7 +68,7 @@ func (_mr *MockSKUDataAccessMockRecorder) Print() *gomock.Call {
 }
 
 // Update mocks base method
-func (_m *MockSKUDataAccess) Update(_param0 int, _param1 int) error {
+func (_m *MockSKUDataAccess) Update(_param0 string, _param1 int) error {
 	ret := _m.ctrl.Call(_m, "Update", _param0, _param1)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -80,7 +80,7 @@ func (_mr *MockSKUDataAccessMockRecorder) Update(arg0, arg1 interface{}) *gomock
 }
 
 // Delete mocks base method
-func (_m *MockSKUDataAccess) Delete(_param0 int) error {
+func (_m *MockSKUDataAccess) Delete(_param0 string) error {
 	ret := _m.ctrl.Call(_m, "Delete", _param0)
 	ret0, _ := ret[0].(error)
 	return ret0
