@@ -2,7 +2,6 @@ package logic
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"strconv"
 
@@ -40,10 +39,7 @@ func New() Logic {
 //AddProductSKU validates product info and Inserts into the db
 func (l *logic) AddProductSKU(sku SKU) error {
 	id, _ := strconv.Atoi(sku.ID)
-	fmt.Printf("id: %v\n", id)
-	get := l.mydb.Get(id)
-	fmt.Println(get)
-	if get != "[]" {
+	if l.mydb.Get(sku.ID) != "[]" {
 		return errors.New("Product id already exists")
 	}
 	if sku.Quantity < 1 {
@@ -53,7 +49,7 @@ func (l *logic) AddProductSKU(sku SKU) error {
 		return errors.New("ID must be positive")
 	}
 
-	err := l.mydb.Insert(id, sku.Name, sku.Vendor, sku.Quantity)
+	err := l.mydb.Insert(sku.ID, sku.Name, sku.Vendor, sku.Quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,12 +58,11 @@ func (l *logic) AddProductSKU(sku SKU) error {
 
 //UpdateProductQuantity updates quantity for a given id
 func (l *logic) UpdateProductQuantity(sku SKU) error {
-	id, _ := strconv.Atoi(sku.ID)
-	if l.mydb.Get(id) == "[]" {
+	if l.mydb.Get(sku.ID) == "[]" {
 		return errors.New("Product id doesn't exist")
 	}
 
-	err := l.mydb.Update(id, sku.Quantity)
+	err := l.mydb.Update(sku.ID, sku.Quantity)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,11 +71,10 @@ func (l *logic) UpdateProductQuantity(sku SKU) error {
 
 //DeleteID removes all product information for a given id
 func (l *logic) DeleteID(sku SKU) error {
-	id, _ := strconv.Atoi(sku.ID)
-	if l.mydb.Get(id) == "[]" {
+	if l.mydb.Get(sku.ID) == "[]" {
 		return errors.New("Product id doesn't exist")
 	}
-	err := l.mydb.Delete(id)
+	err := l.mydb.Delete(sku.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,8 +88,7 @@ func (l *logic) PrintAllProductInfo() string {
 
 //GetProductInfo returns product details for given id
 func (l *logic) GetProductInfo(sku SKU) (string, error) {
-	id, _ := strconv.Atoi(sku.ID)
-	info := l.mydb.Get(id)
+	info := l.mydb.Get(sku.ID)
 	if info == "[]" {
 		return info, errors.New("Product id doesn't exist")
 	}
