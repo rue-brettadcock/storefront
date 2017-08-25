@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/big"
 	"net/http"
@@ -23,22 +24,24 @@ type sku struct {
 
 var sf = forest.NewClient("http://localhost:8080", new(http.Client))
 
-// func TestPrintSKUs_NoExistingSKUs_NoContent(t *testing.T) {
-// 	printSKU := sf.GET(t, forest.Path("/products"))
-// 	if forest.ExpectStatus(t, printSKU, http.StatusNoContent) != true {
-// 		t.Errorf("Actual: %v\nExpected: %v", printSKU.StatusCode, http.StatusNoContent)
-// 	}
-// }
+func TestPrintSKUs_StatusOK(t *testing.T) {
+	printSKU := sf.GET(t, forest.Path("/products"))
+	if forest.ExpectStatus(t, printSKU, http.StatusOK) != true {
+		t.Errorf("Actual: %v\nExpected: %v", printSKU.StatusCode, http.StatusOK)
+	}
+}
 
 func TestAddSKU_HappyPath_Success(t *testing.T) {
-	sample := sku{ID: "123", Name: "polo", Vendor: "RL", Quantity: 25}
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "polo", Vendor: "RL", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
 	addSKU := sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 	if forest.ExpectStatus(t, addSKU, http.StatusCreated) != true {
 		t.Errorf("Actual: %v\nExpected: %v", addSKU.StatusCode, http.StatusCreated)
 	}
 
-	getSKU := sf.GET(t, forest.Path("/products/123"))
+	path := fmt.Sprintf("/products/%s", uid)
+	getSKU := sf.GET(t, forest.Path(path))
 	if forest.ExpectStatus(t, getSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", getSKU.StatusCode, http.StatusOK)
 	}
@@ -53,7 +56,8 @@ func TestAddSKU_HappyPath_Success(t *testing.T) {
 }
 
 func TestAddSKU_addSameItemTwice_BadRequest(t *testing.T) {
-	sample := sku{ID: "345", Name: "pen", Vendor: "bic", Quantity: 25}
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "pen", Vendor: "bic", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
 	addSKU := sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 
@@ -74,28 +78,32 @@ func TestDeleteID_idDoesntExist_NoContent(t *testing.T) {
 }
 
 func TestDeleteID_idExists_Success(t *testing.T) {
-	sample := sku{ID: "678", Name: "watch", Vendor: "breitling", Quantity: 25}
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "watch", Vendor: "breitling", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
 	sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 
-	delSKU := sf.DELETE(t, forest.Path("/products/678"))
+	path := fmt.Sprintf("/products/%s", uid)
+	delSKU := sf.DELETE(t, forest.Path(path))
 	if forest.ExpectStatus(t, delSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", delSKU.StatusCode, http.StatusOK)
 	}
 }
 
 func TestUpdateSKU_productExists_Success(t *testing.T) {
-	sample := sku{ID: "678", Name: "watch", Vendor: "breitling", Quantity: 25}
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "watch", Vendor: "breitling", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
 	sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 
-	b := `{"id":"678","quantity":1000}`
+	b := fmt.Sprintf("{\"id\":\"%s\",\"quantity\":\"1000\"}", uid)
 	updateSKU := sf.PUT(t, forest.Path("/products").Body(b))
 	if forest.ExpectStatus(t, updateSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", updateSKU.StatusCode, http.StatusOK)
 	}
 
-	getSKU := sf.GET(t, forest.Path("/products/678"))
+	path := fmt.Sprintf("/products/%s", uid)
+	getSKU := sf.GET(t, forest.Path(path))
 	body, _ := ioutil.ReadAll(getSKU.Body)
 	var actual sku
 	json.Unmarshal(body, &actual)
@@ -105,7 +113,8 @@ func TestUpdateSKU_productExists_Success(t *testing.T) {
 }
 
 func TestUpdateSKU_productDoesntExists_BadReqest(t *testing.T) {
-	b := `{"id":"890","quantity":1000}`
+	uid := newUUID()
+	b := fmt.Sprintf("{\"id\":\"%s\",\"quantity\":\"1000\"}", uid)
 	updateSKU := sf.PUT(t, forest.Path("/products").Body(b))
 	if forest.ExpectStatus(t, updateSKU, http.StatusBadRequest) != true {
 		t.Errorf("Actual: %v\nExpected: %v", updateSKU.StatusCode, http.StatusBadRequest)
@@ -113,11 +122,13 @@ func TestUpdateSKU_productDoesntExists_BadReqest(t *testing.T) {
 }
 
 func TestGetSKU_idExists_Success(t *testing.T) {
-	sample := sku{ID: "456", Name: "clock", Vendor: "atomic", Quantity: 120}
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "clock", Vendor: "atomic", Quantity: 120}
 	productInfo, _ := json.Marshal(&sample)
 	sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 
-	getSKU := sf.GET(t, forest.Path("/products/456"))
+	path := fmt.Sprintf("/products/%v", uid)
+	getSKU := sf.GET(t, forest.Path(path))
 	if forest.ExpectStatus(t, getSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", getSKU.StatusCode, http.StatusOK)
 	}
@@ -137,7 +148,7 @@ func TestGetSKU_idDoesntExists_NoContent(t *testing.T) {
 	}
 }
 
-func newIntUUID() string {
+func newUUID() string {
 	u := uuid.NewV1()
 	var i big.Int
 	res, _ := i.SetString(strings.Replace(u.String(), "-", "", 4), 16)
