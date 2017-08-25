@@ -2,6 +2,7 @@ package logic
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -39,7 +40,10 @@ func New() Logic {
 //AddProductSKU validates product info and Inserts into the db
 func (l *logic) AddProductSKU(sku SKU) error {
 	id, _ := strconv.Atoi(sku.ID)
-	if l.mydb.Get(id) != "[]" {
+	fmt.Printf("id: %v\n", id)
+	get := l.mydb.Get(id)
+	fmt.Println(get)
+	if get != "[]" {
 		return errors.New("Product id already exists")
 	}
 	if sku.Quantity < 1 {
