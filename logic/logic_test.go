@@ -1,8 +1,9 @@
 package logic
 
 import (
-	"errors"
 	"testing"
+
+	errors "github.com/pkg/errors"
 
 	"github.com/golang/mock/gomock"
 	"github.com/rue-brettadcock/storefront/mocks"
