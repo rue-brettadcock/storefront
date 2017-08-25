@@ -137,9 +137,9 @@ func TestGetSKU_idDoesntExists_NoContent(t *testing.T) {
 	}
 }
 
-func newIntUUID() *big.Int {
+func newIntUUID() string {
 	u := uuid.NewV1()
 	var i big.Int
 	res, _ := i.SetString(strings.Replace(u.String(), "-", "", 4), 16)
-	return res
+	return res.String()
 }
