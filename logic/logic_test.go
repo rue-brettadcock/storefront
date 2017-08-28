@@ -138,3 +138,40 @@ func TestDeleteID_SuccessfulDelete(t *testing.T) {
 		t.Errorf("Actual: %s\nExpected: nil", actual)
 	}
 }
+
+func TestGetProductInfo_idDoesntExist(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	mDB := mocks.NewMockSKUDataAccess(mockCtrl)
+	l.mydb = mDB
+	mDB.EXPECT().Get("1000").Return("[]")
+
+	sku := SKU{"1000", "", "", 0}
+	actual, err := l.GetProductInfo(sku)
+	expected := "[]"
+	if actual != expected {
+		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
+	}
+	if err.Error() != "Product id doesn't exist" {
+		t.Error(err)
+	}
+}
+
+// func TestGetProductInfo_idExists_Successful(t *testing.T) {
+// 	mockCtrl := gomock.NewController(t)
+// 	defer mockCtrl.Finish()
+// 	mDB := mocks.NewMockSKUDataAccess(mockCtrl)
+// 	l.mydb = mDB
+// 	json := `{"id":"2345","name":"notepad","vendor":"earthwise","quantity":14}`
+// 	mDB.EXPECT().Get("2345").Return(json) //HOW TO HANDLE MULTIPLE RETURN VALUES??
+// 	Returns(json, nil)
+
+// 	sku := SKU{"2345", "notepad", "earthwise", 14}
+// 	actual, err := l.GetProductInfo(sku)
+// 	if actual != json {
+// 		t.Errorf("Actual: %s\nExpected: %s", actual, json)
+// 	}
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// }
