@@ -22,7 +22,7 @@ func TestAddProductSKU_IDalreadyExists(t *testing.T) {
 	expected := errors.New("Product id already exists")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -38,7 +38,7 @@ func TestAddProductSKU_quantityLessThan1(t *testing.T) {
 	expected := errors.New("Quantity must be at least 1")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -54,7 +54,7 @@ func TestAddProductSKU_NegativeID(t *testing.T) {
 	expected := errors.New("ID must be positive")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -86,7 +86,7 @@ func TestUpdateProductQuantity_IDdoesntExist(t *testing.T) {
 	expected := errors.New("Product id doesn't exist")
 	actual := l.UpdateProductQuantity(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -118,7 +118,7 @@ func TestDeleteID_IDdoesntExist(t *testing.T) {
 	expected := errors.New("Product id doesn't exist")
 	actual := l.DeleteID(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
