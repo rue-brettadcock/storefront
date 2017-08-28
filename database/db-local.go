@@ -2,6 +2,9 @@ package database
 
 import (
 	"encoding/json"
+	"fmt"
+
+	errors "github.com/pkg/errors"
 )
 
 type sku struct {
@@ -50,12 +53,18 @@ func (m *MemDb) Print() string {
 
 //Update changes the products quantity
 func (m *MemDb) Update(id string, amt int) error {
-	for _, s := range m.db {
+	position := -1
+	for i, s := range m.db {
 		if s.ID == id {
-			s.Quantity = amt
+			fmt.Printf("found matching id: %v, amt: %v\n", id, amt)
+			position = i
 			break
 		}
 	}
+	if position == -1 {
+		return errors.New("No matching product id found")
+	}
+	m.db[position].Quantity = amt
 	return nil
 }
 
