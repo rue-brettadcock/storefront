@@ -2,9 +2,8 @@ package database
 
 import (
 	"encoding/json"
-	"fmt"
 
-	errors "github.com/pkg/errors"
+	"errors"
 )
 
 type sku struct {
@@ -56,7 +55,6 @@ func (m *MemDb) Update(id string, amt int) error {
 	position := -1
 	for i, s := range m.db {
 		if s.ID == id {
-			fmt.Printf("found matching id: %v, amt: %v\n", id, amt)
 			position = i
 			break
 		}
