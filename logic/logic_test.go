@@ -1,8 +1,9 @@
 package logic
 
 import (
-	"errors"
 	"testing"
+
+	errors "github.com/pkg/errors"
 
 	"github.com/golang/mock/gomock"
 	"github.com/rue-brettadcock/storefront/mocks"
@@ -21,7 +22,7 @@ func TestAddProductSKU_IDalreadyExists(t *testing.T) {
 	expected := errors.New("Product id already exists")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -37,7 +38,7 @@ func TestAddProductSKU_quantityLessThan1(t *testing.T) {
 	expected := errors.New("Quantity must be at least 1")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -53,7 +54,7 @@ func TestAddProductSKU_NegativeID(t *testing.T) {
 	expected := errors.New("ID must be positive")
 	actual := l.AddProductSKU(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -85,7 +86,7 @@ func TestUpdateProductQuantity_IDdoesntExist(t *testing.T) {
 	expected := errors.New("Product id doesn't exist")
 	actual := l.UpdateProductQuantity(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -117,7 +118,7 @@ func TestDeleteID_IDdoesntExist(t *testing.T) {
 	expected := errors.New("Product id doesn't exist")
 	actual := l.DeleteID(sku)
 
-	if actual != expected {
+	if actual.Error() != expected.Error() {
 		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
 	}
 }
@@ -137,3 +138,40 @@ func TestDeleteID_SuccessfulDelete(t *testing.T) {
 		t.Errorf("Actual: %s\nExpected: nil", actual)
 	}
 }
+
+func TestGetProductInfo_idDoesntExist(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	mDB := mocks.NewMockSKUDataAccess(mockCtrl)
+	l.mydb = mDB
+	mDB.EXPECT().Get("1000").Return("[]")
+
+	sku := SKU{"1000", "", "", 0}
+	actual, err := l.GetProductInfo(sku)
+	expected := "[]"
+	if actual != expected {
+		t.Errorf("Actual: %s\nExpected: %s", actual, expected)
+	}
+	if err.Error() != "Product id doesn't exist" {
+		t.Error(err)
+	}
+}
+
+// func TestGetProductInfo_idExists_Successful(t *testing.T) {
+// 	mockCtrl := gomock.NewController(t)
+// 	defer mockCtrl.Finish()
+// 	mDB := mocks.NewMockSKUDataAccess(mockCtrl)
+// 	l.mydb = mDB
+// 	json := `{"id":"2345","name":"notepad","vendor":"earthwise","quantity":14}`
+// 	mDB.EXPECT().Get("2345").Return(json) //HOW TO HANDLE MULTIPLE RETURN VALUES??
+// 	Returns(json, nil)
+
+// 	sku := SKU{"2345", "notepad", "earthwise", 14}
+// 	actual, err := l.GetProductInfo(sku)
+// 	if actual != json {
+// 		t.Errorf("Actual: %s\nExpected: %s", actual, json)
+// 	}
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// }

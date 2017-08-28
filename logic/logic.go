@@ -1,9 +1,10 @@
 package logic
 
 import (
-	"errors"
 	"log"
 	"strconv"
+
+	errors "github.com/pkg/errors"
 
 	"github.com/rue-brettadcock/storefront/database"
 )

@@ -27,28 +27,26 @@ func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
 }
 
 func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
-
 	msg := p.logic.PrintAllProductInfo()
-	fmt.Fprintf(res, "%v\n", msg)
+
 	if msg == "[]" {
 		res.WriteHeader(http.StatusNoContent)
 		return
 	}
-	res.WriteHeader(http.StatusOK)
+	fmt.Fprintf(res, "%v\n", msg)
 }
 
 func (p *Presentation) getSKU(res http.ResponseWriter, req *http.Request) {
-
 	var sku logic.SKU
 	params := mux.Vars(req)
 	sku.ID = params["id"]
 	msg, err := p.logic.GetProductInfo(sku)
-	fmt.Fprintf(res, "%v\n", msg)
+
 	if err != nil {
 		res.WriteHeader(http.StatusNoContent)
 		return
 	}
-	res.WriteHeader(http.StatusOK)
+	fmt.Fprintf(res, "%v\n", msg)
 }
 
 func (p *Presentation) updateSKU(res http.ResponseWriter, req *http.Request) {

@@ -2,6 +2,8 @@ package database
 
 import (
 	"encoding/json"
+
+	errors "github.com/pkg/errors"
 )
 
 type sku struct {
@@ -50,12 +52,17 @@ func (m *MemDb) Print() string {
 
 //Update changes the products quantity
 func (m *MemDb) Update(id string, amt int) error {
-	for _, s := range m.db {
+	position := -1
+	for i, s := range m.db {
 		if s.ID == id {
-			s.Quantity = amt
+			position = i
 			break
 		}
 	}
+	if position == -1 {
+		return errors.New("Failed to update sku")
+	}
+	m.db[position].Quantity = amt
 	return nil
 }
 
