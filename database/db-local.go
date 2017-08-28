@@ -3,7 +3,7 @@ package database
 import (
 	"encoding/json"
 
-	"errors"
+	errors "github.com/pkg/errors"
 )
 
 type sku struct {
@@ -60,7 +60,7 @@ func (m *MemDb) Update(id string, amt int) error {
 		}
 	}
 	if position == -1 {
-		return errors.New("No matching product id found")
+		return errors.New("Failed to update sku")
 	}
 	m.db[position].Quantity = amt
 	return nil
