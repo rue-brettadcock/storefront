@@ -96,8 +96,8 @@ func TestUpdateSKU_productExists_Success(t *testing.T) {
 	productInfo, _ := json.Marshal(&sample)
 	sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 
-	b := fmt.Sprintf("{\"id\":\"%s\",\"quantity\":\"1000\"}", uid)
-	updateSKU := sf.PUT(t, forest.Path("/products").Body(b))
+	reqBody := fmt.Sprintf("{\"id\":\"%s\",\"quantity\":1000}", uid)
+	updateSKU := sf.PUT(t, forest.Path("/products").Body(reqBody))
 	if forest.ExpectStatus(t, updateSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", updateSKU.StatusCode, http.StatusOK)
 	}
@@ -107,6 +107,8 @@ func TestUpdateSKU_productExists_Success(t *testing.T) {
 	body, _ := ioutil.ReadAll(getSKU.Body)
 	var actual sku
 	json.Unmarshal(body, &actual)
+
+	sample.Quantity = 1000
 	if actual != sample {
 		t.Errorf("Actual: %v\nExpected: %v", actual, sample)
 	}
