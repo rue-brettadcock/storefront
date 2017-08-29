@@ -48,18 +48,18 @@ func (s *SQLdb) Update(id string, quantity int) error {
 
 //Get returns the product info for a given id
 func (s *SQLdb) Get(id string) string {
-	res, err := s.buildJSON("SELECT * FROM products WHERE id=" + id)
-	if err != nil {
-		return "[]"
+	res, _ := s.buildJSON("SELECT * FROM products WHERE id=" + id)
+	if res == "" {
+		res = "[]"
 	}
 	return res
 }
 
 //Print prints product information from database
 func (s *SQLdb) Print() string {
-	res, err := s.buildJSON("SELECT * FROM products")
-	if err != nil {
-		return ""
+	res, _ := s.buildJSON("SELECT * FROM products")
+	if res == "" {
+		res = "[]"
 	}
 	return res
 }
