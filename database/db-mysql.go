@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
-	"strconv"
 
 	//drivers for mysql connection
 	_ "github.com/go-sql-driver/mysql"
@@ -29,28 +28,27 @@ func openDatabaseConnection() *sql.DB {
 }
 
 //Delete removes an entry based on id from the products table in productInfo db
-func (s *SQLdb) Delete(id int) error {
+func (s *SQLdb) Delete(id string) error {
 	_, err := s.db.Exec("DELETE FROM products WHERE id=?", id)
 	return err
 }
 
 //Insert puts given product information into the products table in the db
-func (s *SQLdb) Insert(id int, name string, vendor string, quantity int) error {
+func (s *SQLdb) Insert(id string, name string, vendor string, quantity int) error {
 	_, err := s.db.Exec("INSERT INTO products(id, name, vendor, quantity) VALUES(?, ?, ?, ?)",
 		id, name, vendor, quantity)
 	return err
 }
 
 //Update changes the products quantity
-func (s *SQLdb) Update(id, quantity int) error {
+func (s *SQLdb) Update(id string, quantity int) error {
 	_, err := s.db.Exec("UPDATE products SET quantity=? WHERE id=?", quantity, id)
 	return err
 }
 
 //Get returns the product info for a given id
-func (s *SQLdb) Get(id int) string {
-	idStr := strconv.Itoa(id)
-	res, err := s.buildJSON("SELECT * FROM products WHERE id=" + idStr)
+func (s *SQLdb) Get(id string) string {
+	res, err := s.buildJSON("SELECT * FROM products WHERE id=" + id)
 	if err != nil {
 		return ""
 	}
