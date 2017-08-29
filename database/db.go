@@ -9,11 +9,11 @@ type SKUDataAccess interface {
 	Delete(string) error
 }
 
-// //NewSQL initializes a pointer to a sql database
-// func NewSQL() SKUDataAccess {
-// 	sql := SQLdb{db: openDatabaseConnection()}
-// 	return &sql
-// }
+//NewSQL initializes a pointer to a sql database
+func NewSQL() SKUDataAccess {
+	sql := SQLdb{db: openDatabaseConnection()}
+	return &sql
+}
 
 //NewInMemoryDB initializes a pointer to a local database
 func NewInMemoryDB() SKUDataAccess {

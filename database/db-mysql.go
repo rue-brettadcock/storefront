@@ -50,7 +50,7 @@ func (s *SQLdb) Update(id string, quantity int) error {
 func (s *SQLdb) Get(id string) string {
 	res, err := s.buildJSON("SELECT * FROM products WHERE id=" + id)
 	if err != nil {
-		return ""
+		return "[]"
 	}
 	return res
 }
