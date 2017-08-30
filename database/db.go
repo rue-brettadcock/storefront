@@ -9,6 +9,13 @@ type SKUDataAccess interface {
 	Delete(string) error
 }
 
+type sku struct {
+	ID       string `json:"id,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Vendor   string `json:"vendor,omitempty"`
+	Quantity int    `json:"quantity,omitempty"`
+}
+
 //NewSQL initializes a pointer to a sql database
 func NewSQL() SKUDataAccess {
 	sql := SQLdb{db: openDatabaseConnection()}

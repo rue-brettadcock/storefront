@@ -6,13 +6,6 @@ import (
 	errors "github.com/pkg/errors"
 )
 
-type sku struct {
-	ID       string `json:"id,omitempty"`
-	Name     string `json:"name,omitempty"`
-	Vendor   string `json:"vendor,omitempty"`
-	Quantity int    `json:"quantity,omitempty"`
-}
-
 //MemDb is a struct to restrict access to the db
 type MemDb struct {
 	db []sku
