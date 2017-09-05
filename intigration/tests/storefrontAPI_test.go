@@ -24,27 +24,6 @@ type sku struct {
 
 var sf = forest.NewClient("http://localhost:8080", new(http.Client))
 
-// func TestDataRace(t *testing.T) {
-// 	var uuids [10]string
-// 	var skus [10]sku
-// 	var responces [10]http.Response
-
-// 	for i := 0; i < 10; i++ {
-// 		uuids[i] = newUUID()
-// 		skus[i] = sku{ID: uuids[i], Name: "polo" + string(i), Vendor: "RL" + string(i), Quantity: 25}
-// 		productInfo, _ := json.Marshal(&skus[i])
-// 		responces[i] = *sf.POST(t, forest.Path("/products").Body(string(productInfo)))
-// 	}
-
-// 	for i := 0; i < 10; i++ {
-// 		go func(uid string) {
-// 			path := fmt.Sprintf("/products/%v", uid)
-// 			body := fmt.Sprintf("{\"id\":\"%v,\"quantity\":%v", uid, i)
-// 			sf.PUT(t, forest.Path(path).Body(body))
-// 		}(uuids[1])
-// 	}
-// }
-
 func TestPrintSKUs_StatusOK(t *testing.T) {
 	printSKU := sf.GET(t, forest.Path("/products"))
 	if forest.ExpectStatus(t, printSKU, http.StatusOK) != true {
