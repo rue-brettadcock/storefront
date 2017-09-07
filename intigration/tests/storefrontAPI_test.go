@@ -43,6 +43,10 @@ func closeServ() {
 
 }
 
+func add1(num int) int {
+	return num + 1
+}
+
 func BenchmarkRaceTest_updateSKU(b *testing.B) {
 	initServ()
 	defer closeServ()
@@ -53,9 +57,8 @@ func BenchmarkRaceTest_updateSKU(b *testing.B) {
 	i := 0
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			i++
 			func() (*http.Response, *http.Response) {
-				return c.UpdateSKU(t, "12", i), c.GetSKU(t, "12")
+				return c.UpdateSKU(t, "12", add1(i)), c.GetSKU(t, "12")
 			}()
 
 		}
