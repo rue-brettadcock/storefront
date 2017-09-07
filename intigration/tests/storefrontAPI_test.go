@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/emicklei/forest"
+	"github.com/rue-brettadcock/storefront/intigration/client"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -23,6 +24,44 @@ type sku struct {
 }
 
 var sf = forest.NewClient("http://localhost:8080", new(http.Client))
+
+func initServ() {
+
+	t := &testing.T{}
+	server := forest.NewClient("http://localhost:8080", new(http.Client))
+	//uid := newUUID()
+	sku1 := sku{ID: "12", Name: "polo", Vendor: "RL", Quantity: 25}
+	productInfo, _ := json.Marshal(&sku1)
+	server.POST(t, forest.Path("/products").Body(string(productInfo)))
+
+}
+
+func closeServ() {
+	t := &testing.T{}
+	server := forest.NewClient("http://localhost:8080", new(http.Client))
+	server.DELETE(t, forest.Path("/products/12"))
+
+}
+
+func BenchmarkRaceTest_updateSKU(b *testing.B) {
+	initServ()
+	defer closeServ()
+	t := &testing.T{}
+	c := client.New(endpoint)
+
+	b.ResetTimer()
+	i := 0
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			i++
+			func() (*http.Response, *http.Response) {
+				return c.UpdateSKU(t, "12", i), c.GetSKU(t, "12")
+			}()
+
+		}
+	})
+
+}
 
 func TestPrintSKUs_StatusOK(t *testing.T) {
 	printSKU := sf.GET(t, forest.Path("/products"))
