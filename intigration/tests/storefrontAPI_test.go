@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/emicklei/forest"
+	"github.com/rue-brettadcock/storefront/intigration/client"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -24,6 +25,47 @@ type sku struct {
 
 var sf = forest.NewClient("http://localhost:8080", new(http.Client))
 
+func initServ() {
+
+	t := &testing.T{}
+	server := forest.NewClient("http://localhost:8080", new(http.Client))
+	//uid := newUUID()
+	sku1 := sku{ID: "12", Name: "polo", Vendor: "RL", Quantity: 25}
+	productInfo, _ := json.Marshal(&sku1)
+	server.POST(t, forest.Path("/products").Body(string(productInfo)))
+
+}
+
+func closeServ() {
+	t := &testing.T{}
+	server := forest.NewClient("http://localhost:8080", new(http.Client))
+	server.DELETE(t, forest.Path("/products/12"))
+
+}
+
+func add1(num int) int {
+	return num + 1
+}
+
+func BenchmarkRaceTest_updateSKU(b *testing.B) {
+	initServ()
+	defer closeServ()
+	t := &testing.T{}
+	c := client.New(endpoint)
+
+	b.ResetTimer()
+	i := 0
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			func() (*http.Response, *http.Response) {
+				return c.UpdateSKU(t, "12", add1(i)), c.GetSKU(t, "12")
+			}()
+
+		}
+	})
+
+}
+
 func TestPrintSKUs_StatusOK(t *testing.T) {
 	printSKU := sf.GET(t, forest.Path("/products"))
 	if forest.ExpectStatus(t, printSKU, http.StatusOK) != true {
@@ -31,10 +73,11 @@ func TestPrintSKUs_StatusOK(t *testing.T) {
 	}
 }
 
-func TestAddSKU_HappyPath_Success(t *testing.T) {
+func TestAddSKU_HappyPath_StatusCreated(t *testing.T) {
 	uid := newUUID()
 	sample := sku{ID: uid, Name: "polo", Vendor: "RL", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
+
 	addSKU := sf.POST(t, forest.Path("/products").Body(string(productInfo)))
 	if forest.ExpectStatus(t, addSKU, http.StatusCreated) != true {
 		t.Errorf("Actual: %v\nExpected: %v", addSKU.StatusCode, http.StatusCreated)
@@ -64,9 +107,10 @@ func TestAddSKU_addSameItemTwice_BadRequest(t *testing.T) {
 	if forest.ExpectStatus(t, addSKU, http.StatusCreated) != true {
 		t.Errorf("Actual: %v\nExpected: %v", addSKU.StatusCode, http.StatusCreated)
 	}
+
 	addSKU = sf.POST(t, forest.Path("/products").Body(string(productInfo)))
-	if forest.ExpectStatus(t, addSKU, http.StatusBadRequest) != true {
-		t.Errorf("Actual: %v\nExpected: %v", addSKU.StatusCode, http.StatusBadRequest)
+	if forest.ExpectStatus(t, addSKU, http.StatusOK) != true {
+		t.Errorf("Actual: %v\nExpected: %v", addSKU.StatusCode, http.StatusOK)
 	}
 }
 
@@ -77,7 +121,7 @@ func TestDeleteID_idDoesntExist_NoContent(t *testing.T) {
 	}
 }
 
-func TestDeleteID_idExists_Success(t *testing.T) {
+func TestDeleteID_idExists_StatusOK(t *testing.T) {
 	uid := newUUID()
 	sample := sku{ID: uid, Name: "watch", Vendor: "breitling", Quantity: 25}
 	productInfo, _ := json.Marshal(&sample)
@@ -87,6 +131,29 @@ func TestDeleteID_idExists_Success(t *testing.T) {
 	delSKU := sf.DELETE(t, forest.Path(path))
 	if forest.ExpectStatus(t, delSKU, http.StatusOK) != true {
 		t.Errorf("Actual: %v\nExpected: %v", delSKU.StatusCode, http.StatusOK)
+	}
+
+	getSKU := sf.GET(t, forest.Path(path))
+	if forest.ExpectStatus(t, getSKU, http.StatusNoContent) != true {
+		t.Errorf("Actual: %v\nExpected: %v", getSKU.StatusCode, http.StatusNoContent)
+	}
+}
+
+func TestDeleteID_removeSameIDTwice_StatusOK(t *testing.T) {
+	uid := newUUID()
+	sample := sku{ID: uid, Name: "watch", Vendor: "breitling", Quantity: 25}
+	productInfo, _ := json.Marshal(&sample)
+	sf.POST(t, forest.Path("/products").Body(string(productInfo)))
+
+	path := fmt.Sprintf("/products/%s", uid)
+	delSKU := sf.DELETE(t, forest.Path(path))
+	if forest.ExpectStatus(t, delSKU, http.StatusOK) != true {
+		t.Errorf("Actual: %v\nExpected: %v", delSKU.StatusCode, http.StatusOK)
+	}
+
+	delSKU2 := sf.DELETE(t, forest.Path(path))
+	if forest.ExpectStatus(t, delSKU2, http.StatusNoContent) != true {
+		t.Errorf("Actual: %v\nExpected: %v", delSKU2.StatusCode, http.StatusNoContent)
 	}
 }
 

@@ -18,7 +18,6 @@ func setup() {
 	flag.Parse()
 	fmt.Println("endpoint: ", endpoint)
 	go service.ListenAndServe()
-	fmt.Println("Listening ...")
 }
 
 func shutdown() {

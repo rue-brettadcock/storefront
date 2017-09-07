@@ -20,7 +20,7 @@ func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
 
 	err := p.logic.AddProductSKU(sku)
 	if err != nil {
-		res.WriteHeader(http.StatusBadRequest)
+		res.WriteHeader(http.StatusOK)
 		return
 	}
 	res.WriteHeader(http.StatusCreated)
@@ -28,11 +28,6 @@ func (p *Presentation) addSKU(res http.ResponseWriter, req *http.Request) {
 
 func (p *Presentation) printSKUs(res http.ResponseWriter, req *http.Request) {
 	msg := p.logic.PrintAllProductInfo()
-
-	if msg == "[]" {
-		res.WriteHeader(http.StatusNoContent)
-		return
-	}
 	fmt.Fprintf(res, "%v\n", msg)
 }
 
