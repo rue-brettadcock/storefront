@@ -1,0 +1,10 @@
+version: '2'
+services:
+ gocode:
+   build: .
+   ports:
+    - 8080:8080
+ db:
+   build: ./database
+   ports:
+    - 9090:3306

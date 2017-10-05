@@ -35,7 +35,7 @@ type SKU struct {
 func New() Logic {
 	//database.NewSQL() to use mySQL db
 	//database.NewInMemoryDB() to use local db
-	l := logic{mydb: database.NewInMemoryDB()}
+	l := logic{mydb: database.NewSQL()}
 	return &l
 }
 
