@@ -28,6 +28,6 @@ func ListenAndServe() {
 	router.HandleFunc("/products", handler.updateSKU).Methods("PUT")
 	router.HandleFunc("/products/{id}", handler.deleteSKU).Methods("DELETE")
 
-	log.Println("Listening...")
+	log.Println("Listening... (port: 8080)")
 	http.ListenAndServe(bindTo, router)
 }
